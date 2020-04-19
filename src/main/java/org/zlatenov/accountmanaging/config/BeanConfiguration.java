@@ -1,4 +1,4 @@
-package test.zlatenov.accountmanaging.config;
+package org.zlatenov.accountmanaging.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

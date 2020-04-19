@@ -1,4 +1,4 @@
-package test.zlatenov.accountmanaging.constants;
+package org.zlatenov.accountmanaging.constants;
 
 /**
  * @author Angel Zlatenov

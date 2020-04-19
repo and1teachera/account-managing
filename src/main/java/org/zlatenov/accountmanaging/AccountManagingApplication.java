@@ -1,4 +1,4 @@
-package test.zlatenov.accountmanaging;
+package org.zlatenov.accountmanaging;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

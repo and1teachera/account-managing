@@ -1,4 +1,4 @@
-package test.zlatenov.accountmanaging.web;
+package org.zlatenov.accountmanaging.web;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import test.zlatenov.accountmanaging.model.binding.DeleteUserBindingModel;
-import test.zlatenov.accountmanaging.model.binding.UserBindingModel;
-import test.zlatenov.accountmanaging.model.entity.User;
-import test.zlatenov.accountmanaging.model.vo.UserVO;
-import test.zlatenov.accountmanaging.service.UserService;
+import org.zlatenov.accountmanaging.model.dto.UserDto;
+import org.zlatenov.accountmanaging.model.entity.User;
+import org.zlatenov.accountmanaging.service.UserService;
 
 import java.net.URI;
 import java.util.Collection;
@@ -27,6 +25,7 @@ import java.util.stream.Collectors;
 /**
  * @author Angel Zlatenov
  */
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -39,33 +38,33 @@ public class UserController {
     private ModelMapper modelMapper;
 
     @GetMapping
-    public Collection<UserVO> getUsers() {
-        return userService.getUsers().stream().map(user -> new UserVO()).collect(Collectors.toList());
+    public Collection<UserDto> getUsers() {
+        return userService.getUsers().stream().map(user -> modelMapper.map(user, UserDto.class)).collect(Collectors.toList());
     }
 
     @GetMapping("{email}")
-    public UserVO getUser(@PathVariable String email) {
-        return modelMapper.map(userService.getUserByEmail(email), UserVO.class);
+    public UserDto getUser(@PathVariable String email) {
+        return modelMapper.map(userService.getUserByEmail(email), UserDto.class);
     }
 
     @DeleteMapping("{email}")
-    public void deleteUser(@PathVariable DeleteUserBindingModel deleteUserBindingModel) {
-        userService.deleteUser(deleteUserBindingModel);
+    public void deleteUser(@PathVariable String email) {
+        userService.deleteUser(userService.getUserByEmail(email));
     }
 
     @PostMapping
-    public ResponseEntity<UserVO> createUser(@RequestBody UserBindingModel user) {
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
         User created = userService.createUser(user);
         URI location = MvcUriComponentsBuilder.fromMethodName(UserController.class, "createUser", User.class)
-                .pathSegment("{id}").buildAndExpand(created.getId()).toUri() ;
+                .pathSegment("{id}").buildAndExpand(created.getId()).toUri();
         log.info("User created: {}", location);
-        return ResponseEntity.created(location).body(modelMapper.map(created, UserVO.class));
+        return ResponseEntity.created(location).body(modelMapper.map(created, UserDto.class));
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<UserVO> updateUser(@RequestBody UserBindingModel user) {
+    @PutMapping
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) {
         User updated = userService.updateUser(user);
         log.info("User updated: {}", updated);
-        return ResponseEntity.ok(modelMapper.map(updated, UserVO.class));
+        return ResponseEntity.ok(modelMapper.map(updated, UserDto.class));
     }
 }

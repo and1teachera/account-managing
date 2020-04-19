@@ -1,4 +1,4 @@
-package test.zlatenov.accountmanaging.model.entity;
+package org.zlatenov.accountmanaging.model.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
