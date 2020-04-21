@@ -1,4 +1,4 @@
-package softuni.exam.util;
+package org.zlatenov.accountmanaging.util;
 
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;

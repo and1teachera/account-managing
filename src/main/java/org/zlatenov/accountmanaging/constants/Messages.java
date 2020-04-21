@@ -10,5 +10,6 @@ public final class Messages {
     }
 
     public static final String VALUE_IS_REQUIRED = "Value is required";
-    public static final String VALUE_IS_NOT_VALID = "Value is not valid";
+    public static final String INVALID_DATA = "Invalid Data";
+    public static final String INCORRECT_REQUEST = "Incorrect request!";
 }

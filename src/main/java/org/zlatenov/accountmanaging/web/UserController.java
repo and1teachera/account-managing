@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
  * @author Angel Zlatenov
  */
 
-
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin("http://localhost:4200")
@@ -42,12 +41,12 @@ public class UserController {
         return userService.getUsers().stream().map(user -> modelMapper.map(user, UserDto.class)).collect(Collectors.toList());
     }
 
-    @GetMapping("{email}")
+    @GetMapping("/{email}")
     public UserDto getUser(@PathVariable String email) {
         return modelMapper.map(userService.getUserByEmail(email), UserDto.class);
     }
 
-    @DeleteMapping("{email}")
+    @DeleteMapping("/{email}")
     public void deleteUser(@PathVariable String email) {
         userService.deleteUser(userService.getUserByEmail(email));
     }
