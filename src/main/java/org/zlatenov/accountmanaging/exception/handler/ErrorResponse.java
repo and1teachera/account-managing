@@ -1,4 +1,4 @@
-package org.zlatenov.accountmanaging.exception;
+package org.zlatenov.accountmanaging.exception.handler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

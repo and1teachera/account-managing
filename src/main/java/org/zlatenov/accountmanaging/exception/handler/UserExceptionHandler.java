@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import org.zlatenov.accountmanaging.exception.ErrorResponse;
 import org.zlatenov.accountmanaging.exception.InvalidUserException;
 
 import java.util.ArrayList;

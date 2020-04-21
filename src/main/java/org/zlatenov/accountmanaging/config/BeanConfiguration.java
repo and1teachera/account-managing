@@ -18,10 +18,7 @@ public class BeanConfiguration {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
-//        modelMapper.typeMap(User.class, UserDto.class).addMappings(mapper -> {
-//            mapper.map(src -> src.getBirthDate().toString(), UserDto::setBirthDate);
-//        });
-        Converter<String, LocalDate> toStringDate = new AbstractConverter<String, LocalDate>() {
+        Converter<String, LocalDate> stringLocalDateConverter = new AbstractConverter<String, LocalDate>() {
             @Override
             protected LocalDate convert(String source) {
                 DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -31,7 +28,7 @@ public class BeanConfiguration {
         };
 
         modelMapper.createTypeMap(String.class, LocalDate.class);
-        modelMapper.addConverter(toStringDate);
+        modelMapper.addConverter(stringLocalDateConverter);
         return modelMapper;
     }
 }
