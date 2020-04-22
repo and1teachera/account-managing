@@ -10,6 +10,7 @@ import org.zlatenov.accountmanaging.model.entity.User;
 import org.zlatenov.accountmanaging.repository.UserRepository;
 import org.zlatenov.accountmanaging.util.ValidationUtil;
 
+import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    public static final String USER_WITH_THAT_EMAIL_DOESNT_EXISTS = "User with that email doesnt exists";
+    public static final String USER_WITH_THAT_EMAIL_ALREADY_EXISTS = "User with that email already exists";
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final ValidationUtil validator;
@@ -35,16 +38,27 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
+    @Transactional
     @Override
-    public void deleteUser(User user) {
-        userRepository.delete(user);
+    public void deleteUserByEmail(String email) {
+        if(userRepository.existsByEmail(email)) {
+            userRepository.deleteByEmail(email);
+        }
+        else {
+            throw new InvalidUserException(USER_WITH_THAT_EMAIL_DOESNT_EXISTS);
+        }
     }
 
     @Override
     public User createUser(UserDto userDto) {
-        if(!validator.isValid(userDto)) {
-            throw new InvalidUserException(validator.getViolations(userDto).stream().map(
-                    ConstraintViolation::getMessage).collect(Collectors.joining(",")));
+        if (!validator.isValid(userDto)) {
+            throw new InvalidUserException(validator.getViolations(userDto)
+                                                   .stream()
+                                                   .map(ConstraintViolation::getMessage)
+                                                   .collect(Collectors.joining(",")));
+        }
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new InvalidUserException(USER_WITH_THAT_EMAIL_ALREADY_EXISTS);
         }
         return userRepository.saveAndFlush(modelMapper.map(userDto, User.class));
     }
@@ -52,14 +66,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(UserDto userDto) {
         User user = userRepository.findByEmail(userDto.getEmail());
+        if(user == null) {
+            throw new InvalidUserException(USER_WITH_THAT_EMAIL_DOESNT_EXISTS);
+        }
+        long id = user.getId();
         BeanUtils.copyProperties(modelMapper.map(userDto, User.class), user);
+        user.setId(id);
         return userRepository.saveAndFlush(user);
     }
-//    @ExceptionHandler(InvalidUserException.class)
-//    protected ResponseEntity<Object> handleEntityNotFound(
-//            EntityNotFoundException ex) {
-//        ApiError apiError = new ApiError(NOT_FOUND);
-//        apiError.setMessage(ex.getMessage());
-//        return buildResponseEntity(apiError);
-//    }
 }

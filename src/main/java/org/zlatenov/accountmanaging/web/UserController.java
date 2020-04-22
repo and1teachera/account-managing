@@ -48,7 +48,7 @@ public class UserController {
 
     @DeleteMapping("/{email}")
     public void deleteUser(@PathVariable String email) {
-        userService.deleteUser(userService.getUserByEmail(email));
+        userService.deleteUserByEmail(email);
     }
 
     @PostMapping

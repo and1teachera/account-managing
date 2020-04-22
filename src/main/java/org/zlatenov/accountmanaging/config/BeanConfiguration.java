@@ -18,17 +18,17 @@ public class BeanConfiguration {
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
-        Converter<String, LocalDate> stringLocalDateConverter = new AbstractConverter<String, LocalDate>() {
+        Converter<String, LocalDate> toStringDate = new AbstractConverter<>() {
             @Override
             protected LocalDate convert(String source) {
                 DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate localDate = LocalDate.parse(source, format);
+                LocalDate localDate = LocalDate.parse(source.toLowerCase(), format);
                 return localDate;
             }
         };
 
         modelMapper.createTypeMap(String.class, LocalDate.class);
-        modelMapper.addConverter(stringLocalDateConverter);
+        modelMapper.addConverter(toStringDate);
         return modelMapper;
     }
 }
