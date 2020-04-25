@@ -38,12 +38,15 @@ public class UserController {
 
     @GetMapping
     public Collection<UserDto> getUsers() {
-        return userService.getUsers().stream().map(user -> modelMapper.map(user, UserDto.class)).collect(Collectors.toList());
+        return userService.getUsers()
+                .stream()
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{email}")
-    public UserDto getUser(@PathVariable String email) {
-        return modelMapper.map(userService.getUserByEmail(email), UserDto.class);
+    public ResponseEntity<UserDto> getUser(@PathVariable String email) {
+        return ResponseEntity.ok(modelMapper.map(userService.getUserByEmail(email), UserDto.class));
     }
 
     @DeleteMapping("/{email}")
@@ -55,7 +58,9 @@ public class UserController {
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
         User created = userService.createUser(user);
         URI location = MvcUriComponentsBuilder.fromMethodName(UserController.class, "createUser", User.class)
-                .pathSegment("{id}").buildAndExpand(created.getId()).toUri();
+                .pathSegment("{id}")
+                .buildAndExpand(created.getId())
+                .toUri();
         log.info("User created: {}", location);
         return ResponseEntity.created(location).body(modelMapper.map(created, UserDto.class));
     }
