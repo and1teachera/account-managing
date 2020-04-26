@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class AccountManagingApplicationTests {
+class AccountManagingIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -70,7 +70,7 @@ class AccountManagingApplicationTests {
                 post("/api/users").contentType("application/json").content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().isCreated());
 
-        User userEntity = userRepository.findByEmail("test3@test.bg");
+        User userEntity = userRepository.findByEmail("test3@test.bg").orElse(null);
         assertThat(userEntity.getFirstName()).isEqualTo("Test3");
     }
 
@@ -98,6 +98,7 @@ class AccountManagingApplicationTests {
         assertThat(expectedResponseBody).isEqualToIgnoringWhitespace(actualResponseBody);
     }
 
+    @Transactional
     @Test
     void testDeleteUser() throws Exception {
         User user1 = users.get(0);
@@ -126,6 +127,7 @@ class AccountManagingApplicationTests {
         assertThat(expectedResponseBody).isEqualToIgnoringWhitespace(actualResponseBody);
     }
 
+    @Transactional
     @Test
     void testEditUser() throws Exception {
         User user1 = users.get(0);
@@ -137,13 +139,32 @@ class AccountManagingApplicationTests {
         userDto1.setLastName("LastName");
         userDto1.setBirthDate("1999-10-10");
 
-        mockMvc.perform(put("/api/users/").contentType("application/json")
-                                .content(objectMapper.writeValueAsString(userDto1))).andExpect(status().isOk());
-        User savedUser = userRepository.findByEmail(user1.getEmail());
+        mockMvc.perform(
+                put("/api/users/").contentType("application/json").content(objectMapper.writeValueAsString(userDto1)))
+                .andExpect(status().isOk());
+        User savedUser = userRepository.findByEmail(user1.getEmail()).orElse(null);
 
         assertThat(userDto1.getFirstName()).isEqualTo(savedUser.getFirstName());
         assertThat(userDto1.getLastName()).isEqualTo(savedUser.getLastName());
         assertThat(userDto1.getBirthDate()).isEqualTo(savedUser.getBirthDate().toString());
+    }
+
+    @Test
+    void testDeleteInvalidUser() throws Exception {
+        mockMvc.perform(delete("/api/users/" + "Wrong@email.com")).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testEditInvalidUser() throws Exception {
+        UserDto userDto1 = new UserDto("Invalid", "User", "invalid@invalid.com", "2000-10-10");
+        mockMvc.perform(
+                put("/api/users/").contentType("application/json").content(objectMapper.writeValueAsString(userDto1)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testGetInvalidUser() throws Exception {
+        mockMvc.perform(get("/api/users/" + "Wrong@email.com")).andExpect(status().isBadRequest());
     }
 
 }

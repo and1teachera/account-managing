@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElseThrow(() -> new InvalidUserException(USER_WITH_THAT_EMAIL_DOESNT_EXISTS));
     }
 
     @Transactional
@@ -65,10 +65,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(UserDto userDto) {
-        User user = userRepository.findByEmail(userDto.getEmail());
-        if(user == null) {
-            throw new InvalidUserException(USER_WITH_THAT_EMAIL_DOESNT_EXISTS);
-        }
+        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() -> new InvalidUserException(USER_WITH_THAT_EMAIL_DOESNT_EXISTS));
         long id = user.getId();
         BeanUtils.copyProperties(modelMapper.map(userDto, User.class), user);
         user.setId(id);
