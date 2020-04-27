@@ -29,13 +29,16 @@ public class UserServiceImpl implements UserService {
     private final ValidationUtil validator;
 
     @Override
-    public Collection<User> getUsers() {
-        return userRepository.findAll();
+    public Collection<UserDto> getUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new InvalidUserException(USER_WITH_THAT_EMAIL_DOESNT_EXISTS));
+    public UserDto getUserByEmail(String email) {
+        return modelMapper.map(userRepository.findByEmail(email).orElseThrow(() -> new InvalidUserException(USER_WITH_THAT_EMAIL_DOESNT_EXISTS)), UserDto.class);
     }
 
     @Transactional
@@ -50,7 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(UserDto userDto) {
+    public void createUser(UserDto userDto) {
         if (!validator.isValid(userDto)) {
             throw new InvalidUserException(validator.getViolations(userDto)
                                                    .stream()
@@ -60,15 +63,15 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new InvalidUserException(USER_WITH_THAT_EMAIL_ALREADY_EXISTS);
         }
-        return userRepository.saveAndFlush(modelMapper.map(userDto, User.class));
+        userRepository.saveAndFlush(modelMapper.map(userDto, User.class));
     }
 
     @Override
-    public User updateUser(UserDto userDto) {
+    public void updateUser(UserDto userDto) {
         User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() -> new InvalidUserException(USER_WITH_THAT_EMAIL_DOESNT_EXISTS));
         long id = user.getId();
         BeanUtils.copyProperties(modelMapper.map(userDto, User.class), user);
         user.setId(id);
-        return userRepository.saveAndFlush(user);
+        userRepository.saveAndFlush(user);
     }
 }

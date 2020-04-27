@@ -2,7 +2,6 @@ package org.zlatenov.accountmanaging.web;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +19,6 @@ import org.zlatenov.accountmanaging.service.UserService;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * @author Angel Zlatenov
@@ -34,19 +32,15 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private UserService userService;
-    private ModelMapper modelMapper;
 
     @GetMapping
     public Collection<UserDto> getUsers() {
-        return userService.getUsers()
-                .stream()
-                .map(user -> modelMapper.map(user, UserDto.class))
-                .collect(Collectors.toList());
+        return userService.getUsers();
     }
 
     @GetMapping("/{email}")
     public ResponseEntity<UserDto> getUser(@PathVariable String email) {
-        return ResponseEntity.ok(modelMapper.map(userService.getUserByEmail(email), UserDto.class));
+        return ResponseEntity.ok(userService.getUserByEmail(email));
     }
 
     @DeleteMapping("/{email}")
@@ -56,19 +50,19 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
-        User created = userService.createUser(user);
+        userService.createUser(user);
         URI location = MvcUriComponentsBuilder.fromMethodName(UserController.class, "createUser", User.class)
-                .pathSegment("{id}")
-                .buildAndExpand(created.getId())
+                .pathSegment("{email}")
+                .buildAndExpand(user.getEmail())
                 .toUri();
         log.info("User created: {}", location);
-        return ResponseEntity.created(location).body(modelMapper.map(created, UserDto.class));
+        return ResponseEntity.created(location).body(user);
     }
 
     @PutMapping
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) {
-        User updated = userService.updateUser(user);
-        log.info("User updated: {}", updated);
-        return ResponseEntity.ok(modelMapper.map(updated, UserDto.class));
+        userService.updateUser(user);
+        log.info("User updated: {}", user);
+        return ResponseEntity.ok(user);
     }
 }

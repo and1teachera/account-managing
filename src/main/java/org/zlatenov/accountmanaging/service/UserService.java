@@ -1,7 +1,6 @@
 package org.zlatenov.accountmanaging.service;
 
 import org.zlatenov.accountmanaging.model.dto.UserDto;
-import org.zlatenov.accountmanaging.model.entity.User;
 
 import java.util.Collection;
 
@@ -11,13 +10,13 @@ import java.util.Collection;
 
 public interface UserService {
 
-    Collection<User> getUsers();
+    Collection<UserDto> getUsers();
 
-    User getUserByEmail(String email);
+    UserDto getUserByEmail(String email);
 
-    User createUser(UserDto userDto);
+    void createUser(UserDto userDto);
 
-    User updateUser(UserDto userDto);
+    void updateUser(UserDto userDto);
 
     void deleteUserByEmail(String email);
 }

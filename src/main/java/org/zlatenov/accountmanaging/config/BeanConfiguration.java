@@ -35,7 +35,7 @@ public class BeanConfiguration {
 //
 //    private Connector redirectConnector() {
 //        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
-//        connector.setScheme("http");
+//        connector.setScheme("https");
 //        connector.setPort(8080);
 //        connector.setSecure(false);
 //        connector.setRedirectPort(8443);
